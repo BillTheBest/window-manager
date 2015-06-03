@@ -1,0 +1,29 @@
+{
+    "author": "Dataminr, Inc",
+    "name": "window-manager",
+    "version": "0.0.2",
+    "description": "Helps manage windows in the browser.",
+    "main": "window.js",
+    "keywords": [
+        "advice",
+        "mixins",
+        "javascript",
+        "mixin",
+        "aspect",
+        "reuse",
+        "composable"
+    ],
+    "license": "MIT",
+    "dependencies": {
+        "lodash": "2.4.1"
+    },
+    "devDependencies": {
+    },
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "test",
+        "tests"
+    ]
+}
