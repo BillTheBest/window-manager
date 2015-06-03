@@ -1032,7 +1032,7 @@
         //Setup cache object
         this.refreshCache();
         //Setup current window
-        this.type = (obj.type == "sub" || obj.parent != null) ? "sub" : "master";
+        this.type = (obj.type == "sub" || (obj.parent != null && obj.parent !== obj.name)) ? "sub" : "master";
         this.sticky = 0;
         if(this.type == "sub" && !obj.parent) return console.error("Missing parent window name for type sub");
         this.parent = (obj.parent != null) ? obj.parent : obj.name;
