@@ -1032,10 +1032,10 @@
         //Setup cache object
         this.refreshCache();
         //Setup current window
-        this.type = (obj.parent != null) ? "sub" : "master";
+        this.type = (obj.type == "sub" || obj.parent != null) ? "sub" : "master";
         this.sticky = 0;
-        this.parent = (this.type == "master") ? obj.name : obj.parent;
-        if(this.type == "sub" && this.parent == null) console.error("Missing parent window name for type sub");
+        if(this.type == "sub" && !obj.parent) return console.error("Missing parent window name for type sub");
+        this.parent = (obj.parent != null) ? obj.parent : obj.name;
         this.name = obj.name;
 
         //Some browsers change window.outerHeight to be some small number when the window is minimized.

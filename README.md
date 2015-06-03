@@ -23,16 +23,18 @@ Usage
 -----
 
  # Example of initializing a _"parent"_ WindowManager instance 
+ 
  ````javascript
- new WindowManager({
+ var windowManager = new WindowManager({
 	 name: "parentPage",
 	 namespace: "windowManager01",
 	 type: "master"
  });
  ````
  ### Example of initializing a _"sub"_ WindowManager instance
+ 
  ````javascript
- new WindowManager({
+ var windowManager = new WindowManager({
 	 name: "subPage1",
 	 namespace: "windowManager01",
 	 parent: "parentPage",
@@ -47,7 +49,7 @@ Visit the [website](http://dataminr.github.io/windowmanager) for more informatio
 Development
 -----------
 
-###Tests and Coverage
+### Tests and Coverage
 
 To generate a test and coverage report:
 
