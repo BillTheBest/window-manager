@@ -254,6 +254,15 @@
          parent: "parentPage",
      });
      ````
+     ### Example of initializing an _"external"_ WindowManager instance
+     ````javascript
+     new WindowManager({
+     name: "externalPopup",
+     type: "external",
+     namespace: "windowManager01"
+     });
+     ````
+     */
     /**
      * @param options
      * @param options.name {string} Name to register current window as
@@ -994,7 +1003,6 @@
         this.refreshCache();
         var msgs = this._getMessages(name || this.name);
         each(msgs, function(msg){
-            console.log(msg);
             var eventObj = {
                 from: msg.from,
                 to: msg.to,
@@ -1013,6 +1021,7 @@
         this.refreshCache();
         this._removeCachedWindow(name);
         this.updateMemory();
+        if(this.type == "external") return;
         this.send({
             name: "windowRemoved",
             to: this.parent
@@ -1021,7 +1030,7 @@
     /**
      * Takes an object that accepts -
      * name:String the name of the this window
-     * type:String (Optional) either "master" or "sub".
+     * type:String (Optional) either "master","sub" or "external".
      * `` If left blank defaults to "master" in case parent is not specified
      * `` If parent is specified type is automatically changed to sub
      * parent:String (Optional for non sub types) the parent name of its parent.
@@ -1032,10 +1041,10 @@
         //Setup cache object
         this.refreshCache();
         //Setup current window
-        this.type = (obj.type == "sub" || (obj.parent != null && obj.parent !== obj.name)) ? "sub" : "master";
+        this.type = (obj.type == "master") ? "master" : (obj.type) ? obj.type : "sub";
         this.sticky = 0;
-        if(this.type == "sub" && !obj.parent) return console.error("Missing parent window name for type sub");
-        this.parent = (obj.parent != null) ? obj.parent : obj.name;
+        this.parent = (obj.type == "external" && !obj.parent) ? "external" : (this.type == "master") ? obj.name : obj.parent;
+        if(this.type == "sub" && this.parent == null) console.error("Missing parent window name for type sub");
         this.name = obj.name;
 
         //Some browsers change window.outerHeight to be some small number when the window is minimized.
@@ -1322,22 +1331,27 @@
                 }, xDiff, yDiff);
             });
         }
-        this.windowPosTimer = setInterval(windowPositionTimerHandler, 5000);
-        //Bind event handler for resize
-        $(window).on('resize', windowResizeHandler);
-        //Bind event handler for refresh
-        if(this.shortcutManager) {
-            var onShortcutFiredCallback = function(event){
-                if(event.name == "makeWindowCloseSilent"){
-                    _this.makeWindowOpenSilent();
-                    _this.makeWindowCloseSilent();
-                }
-            };
-            this.shortcutManager.on("shortcutManagerEvent", onShortcutFiredCallback, this);
-            this.shortcutManager.registerShortcut({
-                keys: [17, 82],
-                title: 'makeWindowCloseSilent'
-            });
+        /*
+            For only non-external windows
+         */
+        if(this.type != "external") {
+            this.windowPosTimer = setInterval(windowPositionTimerHandler, 5000);
+            //Bind event handler for resize
+            $(window).on('resize', windowResizeHandler);
+            //Bind event handler for refresh
+            if(this.shortcutManager) {
+                var onShortcutFiredCallback = function(event){
+                    if(event.name == "makeWindowCloseSilent"){
+                        _this.makeWindowOpenSilent();
+                        _this.makeWindowCloseSilent();
+                    }
+                };
+                this.shortcutManager.on("shortcutManagerEvent", onShortcutFiredCallback, this);
+                this.shortcutManager.registerShortcut({
+                    keys: [17, 82],
+                    title: 'makeWindowCloseSilent'
+                });
+            }
         }
     };
 
