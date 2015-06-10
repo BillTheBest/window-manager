@@ -6,7 +6,7 @@
 <div class="left">
 	In this example, we will animate a windows dimensions.
 </div>
-<iframe src="../resources/demos/demo1.html" class="demo-frame" style="height:300px"></iframe>
+<iframe src="../resources/demos/demo3.html" class="demo-frame" style="height:300px"></iframe>
 
 <div class="clear"></div>
 

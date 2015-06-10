@@ -15,13 +15,21 @@
 </head>
 <body class="demo">
 <button class="open-btn">Open Window</button>
-<button class="close-btn">Close Window</button>
-<button class="focus-btn">Focus Window</button>
+<button class="close-btn" disabled="true">Close Window</button>
+<button class="focus-btn" disabled="true">Focus Window</button>
 <script type="text/javascript">
     var wm = new WindowManager({
         name: 'launch',
         type: 'master',
         namespace: 'windowManagerDemo1'
+    });
+    wm.on('windowAdded:subPage1', function() {
+        $('.close-btn').prop('disabled', false);
+        $('.focus-btn').prop('disabled', false);
+    });
+    wm.on('windowRemoved:subPage1', function() {
+        $('.close-btn').prop('disabled', true);
+        $('.focus-btn').prop('disabled', true);
     });
     $('.open-btn').on('click', function() {
         wm.popupWindow({

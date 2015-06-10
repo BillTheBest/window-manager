@@ -1047,6 +1047,10 @@
             name: "windowRemoved",
             to: this.parent
         }, name, this.parent);
+        this.send({
+            name: "windowRemoved:" + name,
+            to: this.parent
+        }, this.getWindow(name));
     };
     /**
      * Takes an object that accepts -
