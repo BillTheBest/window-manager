@@ -406,7 +406,7 @@
             parent: options.parent
         });
         var win = extend({}, cachedWin, options);
-        if(cachedWin && focus) {
+        if(cachedWin && cachedWin.isOpen && focus) {
             retWin = this.focusWindow(win, popupCallback);
         } else {
             retWin = this.openWindow(win);
@@ -445,9 +445,6 @@
         var reopenAllChildren = options.reopenAllChildren; // Option to relaunch all children on focus
         var userActionMissing = options.noUserAction; // Signal whether a user action is missing in the call stack
 
-        // If the window is being opened return;
-        if(this.beingOpened[parent + '-' + name]) return;
-
         // If this is the target window itself, make it reopen itself
         if(this.name == name && this.parent == parent) {
             this.makeWindowOpenSilent();
@@ -458,10 +455,14 @@
             window.close();
             return win;
         }
+        var cachedWindow = this._getCachedWindow(name, parent);
+
+        // If the window is not open return;
+        if(!cachedWindow || !cachedWindow.isOpen) return;
 
         // If we have access to the current window in our array of window refs just focus it
         var focusedWin;
-        var windowRefObj = this._getWindowRefObj(name || windowName, parent);
+        var windowRefObj = this._getWindowRefObj(windowName || name, parent);
         if(windowRefObj) focusedWin = windowRefObj.popup;
         if(focusedWin && Config.hasNativeWindowFocus() && Config.isValidWindow(focusedWin) && !userActionMissing) {
             focusedWin.focus();
@@ -586,7 +587,7 @@
             // Otherwise store the reference and notify
             } else {
                 _this.notify('poppedUpWindow', win);
-                var windowRefObj = _this._addWindowRefObj(windowName, options.parent, popup);
+                var windowRefObj = _this._addWindowRefObj(windowName || name, options.parent, popup);
                  // Clear the window reference on unload
                 _this._setPopupUnloadHandler(windowName, options.parent, popup);
             }
@@ -1099,7 +1100,8 @@
                     width: window.innerWidth,
                     height: window.innerHeight,
                     left: window.screenX,
-                    top: window.screenY
+                    top: window.screenY,
+                    isOpen: true
                 }
             );
             this._addCachedWindow(name, winVal);
@@ -1308,6 +1310,13 @@
         cachedParent[obj.name] = val;
     };
     /**
+     * Sets  a window to cache
+     * @param name
+     * @param val
+     * @private
+     */
+    wm._setCachedWindow = wm._addCachedWindow;
+    /**
      * Adds a reference object for a window instance
      * @param windowName
      * @param parentName
@@ -1346,6 +1355,20 @@
         if(this.windowRefs[parentName] &&
             this.windowRefs[parentName][windowName])
             return this.windowRefs[parentName][windowName];
+    };
+    /**
+     * Removes the isOpen property from a cached window
+     * @param windowName
+     * @param parentName
+     * @private
+     */
+    wm._setWindowToClosed = function(windowName, parentName) {
+        var cachedWin = _this._getCachedWindow({
+            name: windowName,
+            parent: parentName
+        });
+        if(cachedWin) delete cachedWin.isOpen;
+        this._setCachedWindow(windowName, cachedWin);
     };
     /**
      * Sets the unload event removing the window reference from
@@ -1515,6 +1538,8 @@
                 this._removeWindowFromWindows(this.name);
             }
         }
+        this.refreshCache();
+        this._setWindowToClosed(this.name, this.parent);
         this._clearCachedMessagesForWindow(this.name, this.parent);
         this.updateMemory();
     };
