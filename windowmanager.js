@@ -286,8 +286,6 @@
      * @param options.type {string} Can be either _'master'_, _'sub'_ or _'external'_
      * @param options.suppressMessageCheck {boolean} Whether to *not* check messages on initial page load.
      * Useful when window manager is instantiated before we want any of the attached events handlers to execute.
-     * @param options.shortcutManager {string} A shortcut manager to override refreshes using buttons
-     * @param options.lockChildWindows {boolean} Whether to lock child windows when parent is moved
      * @returns {*}
      * @constructor
      */
@@ -303,10 +301,6 @@
         if(options.config) extend(Config, options.config);
         // Expose the valid window check
         this.isValidWindow = Config.isValidWindow;
-        // Shortcut manager to handle refreshes
-        this.shortcutManager = options.shortcutManager;
-        // Whether or not to lock 'sub' windows to 'master' on move
-        this.lockChildWindows = options.lockChildWindows;
         // Map to hold window references
         this.windowRefs = {};
         // Map to hold temporary value for windows being opened
@@ -1366,7 +1360,7 @@
      * @private
      */
     wm._setWindowToClosed = function(windowName, parentName) {
-        var cachedWin = _this._getCachedWindow({
+        var cachedWin = this._getCachedWindow({
             name: windowName,
             parent: parentName
         });
@@ -1470,38 +1464,12 @@
         this.on('pingWindowResponse', pingWindowResponseHandler, this);
 
         /*
-         If the lockChildWindows option has been turned on
-         */
-        if(this.lockChildWindows) {
-            //Bind Event Handler for locked window move
-            this.on('resizeBy', resizeByHandler, this);
-            this._setMoveCallback(function(xDiff, yDiff) {
-                _this.send({
-                    name: 'resizeBy'
-                }, xDiff, yDiff);
-            });
-        }
-        /*
             For only non-external windows
          */
         if(this.type != "external") {
             this.windowPosTimer = setInterval(windowPositionTimerHandler, 5000);
             //Bind event handler for resize
             $(window).on('resize', windowResizeHandler);
-            //Bind event handler for refresh
-            if(this.shortcutManager) {
-                var onShortcutFiredCallback = function(event){
-                    if(event.name == "makeWindowCloseSilent"){
-                        _this.makeWindowOpenSilent();
-                        _this.makeWindowCloseSilent();
-                    }
-                };
-                this.shortcutManager.on("shortcutManagerEvent", onShortcutFiredCallback, this);
-                this.shortcutManager.registerShortcut({
-                    keys: [17, 82],
-                    title: 'makeWindowCloseSilent'
-                });
-            }
         }
     };
 
@@ -1541,120 +1509,9 @@
                 this._removeWindowFromWindows(this.name);
             }
         }
-        this.refreshCache();
         this._setWindowToClosed(this.name, this.parent);
         this._clearCachedMessagesForWindow(this.name, this.parent);
         this.updateMemory();
-    };
-
-    /*
-     ## EXPERIMENTAL
-     */
-    wm._setMoveCallback = function(cb) {
-        var _this = this;
-        $(document).ready(function(){
-            var timer;
-            var timeout;
-            var dragIntTimeShort = 100;
-            var dragIntTimeLong = 2000;
-            var dragInt = dragIntTimeShort;
-            var lastScreenX = window.screenX;
-            var lastScreenY = window.screenY;
-
-            console.log('setting events');
-
-            //Bind Event Handler for App Focus Events
-            window.addEventListener('focus', _debounce(function(){
-                var hasFocus = _this.checkAppFocus();
-                console.log('checking focus', hasFocus);
-                _this.appHasFocus();
-                _this.trigger.apply(_this, ['appFocus', {}, hasFocus]);
-            }, 10, true));
-            window.addEventListener('blur', _debounce(function(){
-                _this.appLostFocus();
-                _this.trigger.apply(_this, ['appBlur', {}]);
-            }, 10, true));
-
-            _this.on('appFocus', function(evt, hasFocus) {
-                console.log('focys', hasFocus);
-                if(!hasFocus) {
-                    console.log('reloading children');
-//                        app.windowManager.reloadAllChildren();
-                }
-                window.isFocused = true;
-                resetDragInterval(dragIntTimeShort);
-            });
-            _this.on('appBlur', function() {
-                console.log('blurred');
-                window.isFocused = false;
-            });
-
-            function checkMove() {
-                return window.screenX !== lastScreenX || window.screenY !== lastScreenY;
-            }
-            function checkWithinBounds() {
-                var o = true;
-//                    if(!(window.screenX > 0) || window.screenX > screen.availWidth) o = false;
-//                    if(!(window.screenY > 0) || window.screenY > screen.availHeight) o = false;
-                return o;
-            }
-            function resetDragInterval(timerInt) {
-                if(timer) clearDragInterval();
-                timer = setInterval(function() {
-                    if(window.isFocused && checkMove() && checkWithinBounds()) {
-                        console.log(window.isFocused, 'move', window.screenX - lastScreenX, window.screenY - lastScreenY);
-                        cb(window.screenX - lastScreenX || 0, window.screenY - lastScreenY || 0);
-                        lastScreenX = window.screenX;
-                        lastScreenY = window.screenY;
-                        resetTimeout();
-                    }
-                }, timerInt);
-            }
-            function resetTimeout() {
-                if(timeout) clearTimeout(timeout);
-                timeout = setTimeout(function() {
-                    clearDragInterval();
-                    resetDragInterval(dragIntTimeLong);
-                }, 5000);
-            }
-            function clearDragInterval() {
-                clearInterval(timer);
-                delete timer;
-            }
-            $('html').mouseleave(function() {
-                resetDragInterval(dragIntTimeShort);
-            });
-
-            $('html').mouseenter(function() {
-                if(timer) {
-                    clearInterval(timer);
-                    delete timer;
-                }
-            });
-
-        });
-    };
-    wm.appHasFocus = function() {
-        if(this.loseFocusTimeout) {
-            clearTimeout(this.loseFocusTimeout);
-            delete this.loseFocusTimeout;
-        }
-        this.refreshCache();
-        this.hasFocus = true;
-        this.updateMemory();
-        console.log('gained focus');
-    };
-    wm.appLostFocus = function() {
-        this.loseFocusTimeout = setTimeout(function() {
-            this.refreshCache();
-            this.hasFocus = false;
-            this.updateMemory();
-            console.log('lost focus');
-        }, 2000);
-    };
-    wm.checkAppFocus = function() {
-        this.refreshCache();
-        return this.hasFocus;
     };
 
     return WindowManager;
