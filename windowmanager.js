@@ -460,6 +460,9 @@
         // If the window is not open return;
         if(!cachedWindow || !cachedWindow.isOpen) return;
 
+        // If the window is being opened return;
+        if(this.beingOpened[parent + '-' + name]) return;
+
         // If we have access to the current window in our array of window refs just focus it
         var focusedWin;
         var windowRefObj = this._getWindowRefObj(windowName || name, parent);
