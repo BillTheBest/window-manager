@@ -1,0 +1,25 @@
+<html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.js" type="text/javascript"></script>
+    <script src="../assets/backbone-events.js" type="text/javascript"></script>
+    <script src="../../windowmanager.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="../docs-style.css" />
+    <style type="text/css">
+        body {
+            background: #333;
+            color: #FFF;
+        }
+    </style>
+</head>
+<body class="demo">
+I am a sub window
+<script type="text/javascript">
+    var wm = new WindowManager({
+        name: 'subPage1',
+        parent: 'launch',
+        namespace: 'windowManagerDemo3'
+    });
+</script>
+</body>
+</html>

@@ -10,11 +10,22 @@ module.exports = function(grunt) {
     /*** File paths for test**/
     var mochaSource = ['test/**/*.test.js'];
 
-    /*** File paths for test**/
-    var documentationPaths = ['index.md', 'docs'];
+    /*** File paths for documentation **/
+    var documentationPaths = ['index.md', 'docs', 'examples'];
+
+    /*** File paths for watch **/
+    var watchPaths = documentationPaths.concat(sourceFilePaths).concat(['examples/**/*.*']);
 
     grunt.initConfig({
-
+        watch: {
+            scripts: {
+                files: watchPaths,
+                tasks: ['docs'],
+                options: {
+                    spawn: false,
+                }
+            }
+        },
         mochaTest: {
             test: {
                 options: {
@@ -110,6 +121,7 @@ module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-open');
     grunt.loadNpmTasks("grunt-mocha-test");
     grunt.loadNpmTasks('grunt-shell');

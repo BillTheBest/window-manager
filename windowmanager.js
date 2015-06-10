@@ -1,35 +1,31 @@
-/**
- WINDOW MANAGER
- ====================
- */
 /*
- * @version 0.0.2
- *
- * @fileOverview Helps manage windows in the browser.
- *
- * Has a number of useful window functions including -
- * 1) Communicating between windows on the same domain and 'namespace'
- * 2) Storing properties associated with windows
- * 3) Opening, closing and focusing windows as well as remembering window properties
- * 4) Animating windows
- *
- * Extremely useful for browser applications dealing with several different pages at the same
- * time. Simplifies communication and management.
- *
- * Lets you specify a "master" window that can control "sub" windows.
- * A master window may contain other popup windows under it. These are automatically opened
- * when the master windowManager is instantiated and their properties like width, height etc
- * are retained from the last time the master window was closed.
- *
- * Can also make sure of window uniqueness by referencing a 'name' property of each WindowManager
- * instance.
- *
- */
+* @version 0.0.2
+*
+* @fileOverview Helps manage windows in the browser.
+*
+* Has a number of useful window functions including -
+* 1) Communicating between windows on the same domain and 'namespace'
+* 2) Storing properties associated with windows
+* 3) Opening, closing and focusing windows as well as remembering window properties
+* 4) Animating windows
+*
+* Extremely useful for browser applications dealing with several different pages at the same
+* time. Simplifies communication and management.
+*
+* Lets you specify a 'master' window that can control 'sub' windows.
+* A master window may contain other popup windows under it. These are automatically opened
+* when the master windowManager is instantiated and their properties like width, height etc
+* are retained from the last time the master window was closed.
+*
+* Can also make sure of window uniqueness by referencing a 'name' property of each WindowManager
+* instance.
+*
+*/
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define([
-            "jquery",
+            'jquery',
             'backbone-events-standalone',
             'lodash/object/extend',
             'lodash/function/delay',
@@ -43,7 +39,8 @@
             'lodash/array/without',
             'lodash/object/keys',
             'lodash/lang/isEqual',
-            'lodash/function/debounce'
+            'lodash/function/debounce',
+            'lodash/collection/reduce'
         ], function (
                 $,
                 events,
@@ -59,7 +56,8 @@
                 without,
                 keys,
                 isEqual,
-                debounce
+                debounce,
+                reduce
             ) {
             return (root.WindowManager = factory(
                 $,
@@ -76,41 +74,49 @@
                 without,
                 keys,
                 isEqual,
-                debounce
+                debounce,
+                reduce
             ));
         });
-    } else if (typeof exports === 'object') {
-        var  $ = require("jquery"),
-            events = require('backbone-events-standalone'),
-            extend = require('lodash/object/extend'),
-            delay = require('lodash/function/delay'),
-            isObject = require('lodash/lang/isObject'),
-            each = require('lodash/collection/each'),
-            cloneDeep = require('lodash/lang/cloneDeep'),
-            bind = require('lodash/function/bind'),
-            min = require('lodash/math/min'),
-            max = require('lodash/math/max'),
-            toArray = require('lodash/lang/toArray'),
-            without  = require('lodash/array/without'),
-            keys = require('lodash/object/keys'),
-            isEqual = require('lodash/lang/isEqual'),
-            debounce = require('lodash/function/debounce');
+    } else {
+//        Browser globals
+        var $ = root.$,
+            events = root.BackboneEvents,
+            extend = root._.extend,
+            delay = root._.delay,
+            isObject = root._.isObject,
+            each = root._.each,
+            cloneDeep = root._.cloneDeep,
+            bind = root._.bind,
+            min = root._.min,
+            max = root._.max,
+            toArray = root._.toArray,
+            without  = root._.without,
+            keys = root._.keys,
+            isEqual = root._.isEqual,
+            debounce = root._.debounce,
+            reduce = root._.reduce;
 
-        module.exports = factory(
+        root.WindowManager = factory(
             $,
             events,
             extend,
-            delay
+            delay,
+            isObject,
+            each,
+            cloneDeep,
+            bind,
+            min,
+            max,
+            toArray,
+            without,
+            keys,
+            isEqual,
+            debounce,
+            reduce
         );
-    } {
-////        Browser globals
-//        var $ = root.$,
-//            events = root.BackboneEvents,
-//            extend = root._.extend,
-//            delay = root._.delay;
-//        root.WindowManager = factory($, events, extend, delay);
     }
-}(this, function ($, events, extend, delay, isObject, each, cloneDeep, bind, _min, _max, toArray, _without, _keys, _isEqual, _debounce) {
+}(this, function ($, events, extend, delay, isObject, each, cloneDeep, bind, _min, _max, toArray, _without, _keys, _isEqual, _debounce, _reduce) {
 
     /*
      ## INTERNAL HELPERS
@@ -188,6 +194,15 @@
     var Config = {
         wmKey: "__windowManager",
         msgTimeout: 60000,
+        popupDelay: 2000,
+        defaultPopupHeight: 200,
+        defaultPopupWidth: 200,
+        macChromeHeight: 52,
+        winChromeHeight: 75,
+        macMinWindowHeight:122,
+        winMinWindowHeight: 75,
+        macMinWindowWidth: 310,
+        winMinWindowWidth: 158,
         hasNativeWindowFocus: function() {
             return true;
         },
@@ -238,28 +253,28 @@
      ## INITIALIZATION
      */
     /*
-     ### Example of initializing a _"parent"_ WindowManager instance
+     #### Example of initializing a _'parent'_ WindowManager instance
      ````javascript
      new WindowManager({
-         name: "parentPage",
-         namespace: "windowManager01",
-         type: "master"
+         name: 'parentPage',
+         namespace: 'windowManager01',
+         type: 'master'
      });
      ````
-     ### Example of initializing a _"sub"_ WindowManager instance
+     #### Example of initializing a _'sub'_ WindowManager instance
      ````javascript
      new WindowManager({
-         name: "subPage1",
-         namespace: "windowManager01",
-         parent: "parentPage",
+         name: 'subPage1',
+         namespace: 'windowManager01',
+         parent: 'parentPage',
      });
      ````
-     ### Example of initializing an _"external"_ WindowManager instance
+     #### Example of initializing an _'external'_ WindowManager instance
      ````javascript
      new WindowManager({
-     name: "externalPopup",
-     type: "external",
-     namespace: "windowManager01"
+     name: 'externalPopup',
+     type: 'external',
+     namespace: 'windowManager01'
      });
      ````
      */
@@ -267,8 +282,8 @@
      * @param options
      * @param options.name {string} Name to register current window as
      * @param options.namespace {string} The namespace to use in localStorage
-     * @param options.parent {string} The 'name' of the parent window. Not required if __type__ is _"master"_.
-     * @param options.type {string} Can be either _"master"_, _"sub"_ or _"external"_
+     * @param options.parent {string} The 'name' of the parent window. Not required if _type_ is _'master'_.
+     * @param options.type {string} Can be either _'master'_, _'sub'_ or _'external'_
      * @param options.suppressMessageCheck {boolean} Whether to *not* check messages on initial page load.
      * Useful when window manager is instantiated before we want any of the attached events handlers to execute.
      * @param options.shortcutManager {string} A shortcut manager to override refreshes using buttons
@@ -284,14 +299,18 @@
         window[Config.wmKey] = this;
         // Namespace for data in localStorage
         this.namespace = options.namespace;
+        // Extend the config
+        if(options.config) extend(Config, options.config);
         // Expose the valid window check
         this.isValidWindow = Config.isValidWindow;
         // Shortcut manager to handle refreshes
         this.shortcutManager = options.shortcutManager;
-        // Whether or not to lock "sub" windows to "master" on move
+        // Whether or not to lock 'sub' windows to 'master' on move
         this.lockChildWindows = options.lockChildWindows;
         // Map to hold window references
         this.windowRefs = {};
+        // Map to hold temporary value for windows being opened
+        this.beingOpened = {};
         // Error check
         if(!(typeof options.name=="string") || !(typeof this.namespace=="string")) console.error('Invalid options for WindowManager');
         // Register the window
@@ -329,7 +348,7 @@
     /**
      *
      * #### send
-     * Function to send messages across windows
+     * Function to send messages across windows.
      * Any additional arguments are passed on to as the second arguments of the message callback
      * @param obj
      * @param obj.name {string} Name of the message
@@ -349,14 +368,13 @@
      * Open a window by name
      * Has the ability to force a window to focus
      *
-     * Will open the window with the properties passed in
-     * such as width, height, left, top etc.
-     * Will default to the saved properties of the window
-     * with the same 'name' as provided.
+     * Will open the window with the properties passed in such as width, height, left, top etc.
+     * Defaults to the saved properties of the window with the same 'name' as provided.
      *
      * @param options
      * @param options.name {string} Name of the WindowManager instance
      * that exists on the page with the same 'location' as provided
+     * @param options.focus {boolean} Whether or not to focus the window if already open
      * @param forceToForeground {boolean} Whether to force the window
      * into focus
      * @returns {*}
@@ -365,14 +383,14 @@
      ##### Example usage of popupWindow
      ```javascript
      app.windowManager.popupWindow({
-     location: path,
-     name: 'notificationPopup',
-     width: 320,
-     height: 1,
-     resizeable: 1,
-     left:left,
-     top:top,
-     focus: true
+         location: path,
+         name: 'notificationPopup',
+         width: 320,
+         height: 1,
+         resizeable: 1,
+         left:left,
+         top:top,
+         focus: true
      });
      ```
      */
@@ -426,6 +444,9 @@
         var windowName = options.windowName;
         var reopenAllChildren = options.reopenAllChildren; // Option to relaunch all children on focus
         var userActionMissing = options.noUserAction; // Signal whether a user action is missing in the call stack
+
+        // If the window is being opened return;
+        if(this.beingOpened[parent + '-' + name]) return;
 
         // If this is the target window itself, make it reopen itself
         if(this.name == name && this.parent == parent) {
@@ -513,15 +534,15 @@
      ##### Example usage of openWindow
      ```javascript
      var win = _this.openWindow({
-     name: name,
-     parent: parent
+     name: 'name',
+     parent: 'parent'
      });
      ```
      */
     wm.openWindow = function(options) {
         var _this = this;
         var name = options.name;
-        var parent = options.parent;
+        var parent = options.parent || this.parent;
         var cachedWin = _this._getCachedWindow({
             name: name,
             parent: parent
@@ -535,23 +556,41 @@
             width: win.width,
             height: win.height
         });
-        var popup = window.open(win.location, windowName, 'width=' + adjustedDimensions.width +',height=' + adjustedDimensions.height + ',resizable=1,left='+ win.left +',top='+ win.top);
-        if(popup && popup.focus) popup.focus(); // If a window already exists with the same location and windowName focus it
+        var winAttrObj = {
+            width: adjustedDimensions.width || Config.defaultPopupHeight,
+            height: adjustedDimensions.height || Config.defaultPopupWidth,
+            resizable: win.resizable,
+            left: win.left,
+            top: win.top
+        };
+        var windowAttrs = _reduce(winAttrObj, function(result, val, key) {
+            if(val == null) return result;
+            if(result !== '') result += ',';
+            result += key + '=' + val;
+            return result;
+        }, '');
+        var popup = window.open(win.location, windowName, windowAttrs);
+        // If a window already exists with the same location and windowName focus it
+        if(popup && popup.focus) popup.focus();
+        // Set the the window being opened to true
+        this.beingOpened[parent + '-' + name] = true;
         /*
          Defer because of a bug in browsers where return window object is not populated immediately
          */
         delay(function() {
+            // Set the the window being opened to false
+            delete _this.beingOpened[parent + '-' + name];
+            // If the window is not valid notify
             if(!popup || !Config.isValidWindow(popup)) {
                 _this.notify('popupBlocked', win);
+            // Otherwise store the reference and notify
             } else {
                 _this.notify('poppedUpWindow', win);
                 var windowRefObj = _this._addWindowRefObj(windowName, options.parent, popup);
-                /*
-                 Clear the window reference on unload
-                 */
+                 // Clear the window reference on unload
                 _this._setPopupUnloadHandler(windowName, options.parent, popup);
             }
-        }, 2000);
+        }, Config.popupDelay);
         return popup;
     };
     /**
@@ -610,7 +649,7 @@
     };
     /**
      * #### deleteProperty
-     * Set a property of a window. These are persisted in memory.
+     * Delete a persisted property of a window
      * @param key Key to set
      * @param name Name of the window
      * @param parent Name of the parent window
@@ -640,7 +679,7 @@
     };
     /**
      * #### getAllWindows
-     * Get All Windows
+     * Get an object representation for all windows in a given parent
      * @param parent Name of parent
      * @returns {*}
      */
@@ -650,7 +689,7 @@
     };
     /**
      * #### getWindow
-     * Get the representation of a window
+     * Get the object representation of a window
      * @param name Name of window
      * @param parent Name of parent
      * @returns {*}
@@ -661,7 +700,7 @@
     };
     /**
      * #### getCurrentWindow
-     * Get the representation of the current window
+     * Get the object representation of the current window
      * @returns {*}
      */
     wm.getCurrentWindow = function() {
@@ -796,17 +835,25 @@
      */
     /**
      * #### animateWindow
-     * animateWindow takes a window instance, some options and a callback and then
-     * animates the given window to the height and width provided
+     * animateWindow takes a window instance, some options and a callback and animates the given window to the
+     * height and width provided
+     *
+     * win {window} window to be animated
+     * options {object}
+     * options.innerHeight innerHeight to animate the window to
+     * options.innerWidth innerWidth to animate the window to
+     * options.anchorBottom
+     * options.anchorRight
+     *
      * @type {*}
      */
     wm.animateWindow = (function() {
         var isAnimating,
             maxHeight,
             maxWidth,
-            chromeHeight = (Config.isMac) ? 52 : 75,
-            minHeight = (Config.isMac) ? 122 : 75,
-            minWidth = (Config.isMac) ? 310 : 158;
+            chromeHeight = (Config.isMac) ? Config.macChromeHeight : Config.winChromeHeight,
+            minHeight = (Config.isMac) ? Config.macMinWindowHeight : Config.winMinWindowHeight,
+            minWidth = (Config.isMac) ? Config.macMinWindowWidth : Config.winMinWindowWidth;
         return function(win, options, callback) {
             if(isAnimating) return;
             isAnimating = true;
@@ -870,32 +917,6 @@
         }
     })();
     /**
-     * #### animateWindowAbove
-     * Animate a window above the current window
-     * @param win
-     * @param options
-     * @returns {*}
-     */
-    wm.animateWindowAbove = function(win, options) {
-        win.moveTo(win.screenX, window.screenY);
-        return this.animateWindow(win, extend({}, options, {
-            anchorBottom: window.screenY
-        }));
-    };
-    /**
-     * #### animateWindowLeftOf
-     * Animate a window left of the current window
-     * @param win
-     * @param options
-     * @returns {*}
-     */
-    wm.animateWindowLeftOf = function(win, options) {
-        win.moveTo(win.screenX, window.screenY);
-        return this.animateWindow(win, extend({}, options, {
-            anchorBottom: window.screenY
-        }));
-    };
-    /**
      * #### moveWindowBy
      * Move a window by an x and y value
      * @param win
@@ -914,7 +935,7 @@
 
     /*
      ### MASTER WINDOWS ONLY
-     _Methods specific to "master" windows_
+     _Methods specific to 'master' windows_
      */
 
     /**
@@ -1030,8 +1051,8 @@
     /**
      * Takes an object that accepts -
      * name:String the name of the this window
-     * type:String (Optional) either "master","sub" or "external".
-     * `` If left blank defaults to "master" in case parent is not specified
+     * type:String (Optional) either 'master','sub' or 'external'.
+     * `` If left blank defaults to 'master' in case parent is not specified
      * `` If parent is specified type is automatically changed to sub
      * parent:String (Optional for non sub types) the parent name of its parent.
      * @param obj
@@ -1136,17 +1157,21 @@
             }, this);
         }
     };
-    wm._getCachedMessage = function(msg) {
-        var msgParent = this._getCachedMessageParent(msg.parent);
-        if(!msgParent) return;
-        return msgParent[msg.uid];
-    };
+    /**
+     * Removes the given message from the cache
+     * @param msg
+     * @private
+     */
     wm._removeCachedMessage = function(msg) {
         var cachedParent = this._getCachedMessageParent(msg.parent);
         delete cachedParent[msg.to][msg.uid];
         if(!_keys(cachedParent[msg.to]).length) delete cachedParent[msg.to];
         if(!_keys(cachedParent)) delete this.cached.msgs[msg.parent];
     };
+    /**
+     * Clears messages older than the Config.msgTimeout time
+     * @private
+     */
     wm._clearOldMessages = function() {
         var hasUpdate = false;
         each(this.cached.msgs, function(cachedMsgParent, parentKey) {
@@ -1161,39 +1186,84 @@
         }, this);
         if(hasUpdate) this.updateMemory();
     };
+    /**
+     * Clears all the messages for a given window
+     * @param name
+     * @param parent
+     * @private
+     */
     wm._clearCachedMessagesForWindow = function(name, parent) {
         var obj = (isObject(name)) ? name : { name:  name, parent: parent };
         var cachedParent = this._getCachedMessageParent(obj);
         if(!cachedParent) return;
         delete cachedParent[obj.name];
     };
+    /**
+     * Clears all the messages for a given parent window
+     * @param parentName
+     * @private
+     */
     wm._clearCachedMessages = function(parentName) {
         var obj = (isObject(parentName)) ? parentName : { parent: parentName };
         var parent = obj.parent || this.parent;
         delete this.cached.msgs[parent];
     };
+    /**
+     * Gets the object representating messages for a given parent
+     * @param obj
+     * @returns {*}
+     * @private
+     */
     wm._getCachedMessageParent = function(obj) {
         obj = (isObject(obj)) ? obj : { parent: obj };
         var parent = obj.parent || this.parent;
         return this.cached.msgs[parent];
     };
+    /**
+     * Adds a cache for messages on a given parent
+     * @param parentName
+     * @private
+     */
     wm._addCachedMessageParent = function(parentName) {
         var obj = (isObject(parentName)) ? parentName : { parent: parentName };
         this.cached.msgs[obj.parent] = this.cached.msgs[obj.parent] || {};
     };
+    /**
+     * Adds a cache for windows on a given parent
+     * @param parentName
+     * @private
+     */
     wm._addCachedWindowParent = function(parentName) {
         var obj = (isObject(parentName)) ? parentName : { parent: parentName };
         this.cached.windows[obj.parent] = this.cached.windows[obj.parent] || {};
     };
+    /**
+     * Retrieves the cache for windows on a given parent
+     * @param parentName
+     * @private
+     */
     wm._getCachedWindowParent = function(parentName) {
         var obj = (isObject(parentName)) ? parentName : { parent: parentName };
         var parent = obj.parent || this.parent;
         return this.cached.windows[parent];
     };
+
+    /**
+     * Removes the cache for windows on a given parent
+     * @param parentName
+     * @private
+     */
     wm._removeCachedWindowParent = function(parentName) {
         var obj = (isObject(parentName)) ? parentName : { parent: parentName };
         delete this.cached.windows[obj.parent];
     };
+    /**
+     * Gets a given window from cache
+     * @param name
+     * @param parent
+     * @returns {*}
+     * @private
+     */
     wm._getCachedWindow = function(name, parent) {
         var obj = (isObject(name)) ? name : { name: name, parent: parent || this.parent };
         var cachedParent = this._getCachedWindowParent(obj);
@@ -1201,22 +1271,46 @@
         var win = obj.name;
         return cachedParent[win];
     };
+    /**
+     * Gets the current window from cache
+     * @returns {*}
+     * @private
+     */
     wm._getCurrentCachedWindow = function() {
         return this._getCachedWindow({
             name: this.name
         });
     };
+    /**
+     * Removes a window from cache
+     * @param name
+     * @private
+     */
     wm._removeCachedWindow = function(name) {
         var obj = (isObject(name)) ? name : { name: name, parent: this.parent };
         var cachedParent = this._getCachedWindowParent(obj.parent);
         delete cachedParent[obj.name];
     };
+    /**
+     * Adds a window to cache
+     * @param name
+     * @param val
+     * @private
+     */
     wm._addCachedWindow = function(name, val) {
         var obj = (isObject(name)) ? name : { name: name, parent: this.parent};
         this._addCachedWindowParent(obj);
         var cachedParent = this._getCachedWindowParent(obj);
         cachedParent[obj.name] = val;
     };
+    /**
+     * Adds a reference object for a window instance
+     * @param windowName
+     * @param parentName
+     * @param win
+     * @returns {*}
+     * @private
+     */
     wm._addWindowRefObj = function(windowName, parentName, win) {
         var windowRefParent = parentName || this.parent;
         this.windowRefs[windowRefParent] = this.windowRefs[windowRefParent] || {};
@@ -1226,17 +1320,37 @@
         windowRefObj.unloadCount = 0;
         return windowRefObj;
     };
+    /**
+     * Removes the reference object for a window instance
+     * @param windowName
+     * @param parentName
+     * @private
+     */
     wm._removeWindowRefObj = function(windowName, parentName) {
         var windowRefParent = parentName || this.parent;
         if(!this.windowRefs[windowRefParent]) return;
         delete this.windowRefs[windowRefParent][windowName];
     };
+    /**
+     * Retrieves the reference object for a window instance
+     * @param windowName
+     * @param parentName
+     * @private
+     */
     wm._getWindowRefObj = function(windowName, parentName) {
         parentName = parentName || this.parent;
         if(this.windowRefs[parentName] &&
             this.windowRefs[parentName][windowName])
             return this.windowRefs[parentName][windowName];
     };
+    /**
+     * Sets the unload event removing the window reference from
+     * cache when the window is closed
+     * @param windowName
+     * @param parentName
+     * @param win
+     * @private
+     */
     wm._setPopupUnloadHandler = function(windowName, parentName, win) {
         var _this = this;
         var windowRefObj = this._getWindowRefObj(windowName, parentName);
@@ -1247,6 +1361,12 @@
             _this._removeWindowRefObj(windowName, parentName);
         });
     };
+    /**
+     * Unsets the unload event for removing window reference from cache
+     * @param windowName
+     * @param parentName
+     * @private
+     */
     wm._unsetPopupUnloadHandler = function(windowName, parentName) {
         var windowRefObj = this._getWindowRefObj(windowName, parentName);
         if(!windowRefObj || !windowRefObj.popup) return;

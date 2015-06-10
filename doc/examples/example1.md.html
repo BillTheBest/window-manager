@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>example1.md</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="../doc-style.css" />
+  <script src="../doc-filelist.js"></script>
+  <script>
+    var relativeDir = "../", thisFile = "examples/example1.md", defaultSidebar = true;
+  </script>
+  <script src="../doc-script.js"></script>
+  <link rel="stylesheet" href="../docs-style.css" />
+</head>
+<body>
+  <div id="sidebar_wrapper">
+    <div id="sidebar_switch">
+      <span class="tree">Files</span>
+      <span class="headings">Headings</span>
+    </div>
+    <div id="tree"></div>
+    <div id="headings">
+    </div>
+  </div>
+  <div id="sidebar-toggle"></div>
+  <div id="container"><div class="docs markdown">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-1" id="section-1">&#182;</a>
+</div>
+<h1 id="basic-example">Basic Example</h1>
+<h2 id="demo">Demo</h2>
+<div class="clear"></div>
+<div class="left">
+    In this basic example, we demonstrate popping up a window, focusing and closing it.
+</div>
+<iframe src="../resources/demos/demo1.html" class="demo-frame" style="height:300px"></iframe>
+
+<div class="clear"></div>
+
+<h2 id="code">Code</h2>
+<div class="spacer"></div>
+<div class="left">
+Create a WindowManager instance.
+</div>
+
+
+<div class="highlight"><pre><code>    <span class="kd">var</span> <span class="nx">wm</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WindowManager</span><span class="p">({</span>
+        <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;launch&#39;</span><span class="p">,</span>
+        <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;master&#39;</span><span class="p">,</span>
+        <span class="nx">namespace</span><span class="o">:</span> <span class="s1">&#39;windowManagerDemo1&#39;</span>
+    <span class="p">});</span>
+</code></pre></div>
+
+
+<div class="clear"></div>
+<div class="left">
+    Define our click event on the open button. Popup a window with a location. 
+    The target page must also have a WindowManager instance with the name &#39;subPage1&#39;.
+</div>
+
+
+<div class="highlight"><pre><code>    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.open-btn&#39;</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">wm</span><span class="p">.</span><span class="nx">popupWindow</span><span class="p">({</span>
+            <span class="nx">location</span><span class="o">:</span> <span class="s1">&#39;demo-sub-page-1.html&#39;</span><span class="p">,</span>
+            <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;subPage1&#39;</span><span class="p">,</span>
+            <span class="nx">left</span><span class="o">:</span> <span class="nb">window</span><span class="p">.</span><span class="nx">screenX</span> <span class="o">+</span> <span class="nb">window</span><span class="p">.</span><span class="nx">outerWidth</span>
+        <span class="p">});</span>
+    <span class="p">});</span>
+</code></pre></div>
+
+
+<div class="clear"></div>
+<div class="left">
+    Define our click event on the open button. Popup a window with a location. 
+    The target page must also have a WindowManager instance with the name &#39;subPage1&#39;.
+</div>
+
+
+<div class="highlight"><pre><code>    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.open-btn&#39;</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">wm</span><span class="p">.</span><span class="nx">popupWindow</span><span class="p">({</span>
+            <span class="nx">location</span><span class="o">:</span> <span class="s1">&#39;demo-sub-page-1.html&#39;</span><span class="p">,</span>
+            <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;subPage1&#39;</span><span class="p">,</span>
+            <span class="nx">left</span><span class="o">:</span> <span class="nb">window</span><span class="p">.</span><span class="nx">screenX</span> <span class="o">+</span> <span class="nb">window</span><span class="p">.</span><span class="nx">outerWidth</span>
+        <span class="p">});</span>
+    <span class="p">});</span>
+</code></pre></div>
+
+
+<div class="clear"></div>
+<div class="left">
+    Define our click event on the close button.
+</div>
+
+
+<div class="highlight"><pre><code>    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.close-btn&#39;</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">wm</span><span class="p">.</span><span class="nx">closeWindow</span><span class="p">(</span><span class="s1">&#39;subPage1&#39;</span><span class="p">);</span>
+    <span class="p">});</span>
+</code></pre></div>
+
+
+<div class="clear"></div>
+<div class="left">
+    Define our click event on the focus button.
+</div>
+
+
+<div class="highlight"><pre><code>    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.focus-btn&#39;</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">wm</span><span class="p">.</span><span class="nx">focusWindow</span><span class="p">({</span>
+            <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;subPage1&#39;</span>
+        <span class="p">});</span>
+    <span class="p">});</span>
+</code></pre></div>
+
+
+</div>
+  </div>
+</body>
+</html>
