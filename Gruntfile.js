@@ -11,7 +11,7 @@ module.exports = function(grunt) {
     var mochaSource = ['test/**/*.test.js'];
 
     /*** File paths for documentation **/
-    var documentationPaths = ['index.md', 'docs', 'examples'];
+    var documentationPaths = ['index.md', 'examples'];
 
     /*** File paths for watch **/
     var watchPaths = documentationPaths.concat(sourceFilePaths).concat(['examples/**/*.*']);

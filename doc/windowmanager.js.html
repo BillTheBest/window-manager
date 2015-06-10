@@ -99,7 +99,8 @@ instance.
             <span class="s1">&#39;lodash/array/without&#39;</span><span class="p">,</span>
             <span class="s1">&#39;lodash/object/keys&#39;</span><span class="p">,</span>
             <span class="s1">&#39;lodash/lang/isEqual&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;lodash/function/debounce&#39;</span>
+            <span class="s1">&#39;lodash/function/debounce&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;lodash/collection/reduce&#39;</span>
         <span class="p">],</span> <span class="kd">function</span> <span class="p">(</span>
                 <span class="nx">$</span><span class="p">,</span>
                 <span class="nx">events</span><span class="p">,</span>
@@ -115,7 +116,8 @@ instance.
                 <span class="nx">without</span><span class="p">,</span>
                 <span class="nx">keys</span><span class="p">,</span>
                 <span class="nx">isEqual</span><span class="p">,</span>
-                <span class="nx">debounce</span>
+                <span class="nx">debounce</span><span class="p">,</span>
+                <span class="nx">reduce</span>
             <span class="p">)</span> <span class="p">{</span>
             <span class="k">return</span> <span class="p">(</span><span class="nx">root</span><span class="p">.</span><span class="nx">WindowManager</span> <span class="o">=</span> <span class="nx">factory</span><span class="p">(</span>
                 <span class="nx">$</span><span class="p">,</span>
@@ -132,7 +134,8 @@ instance.
                 <span class="nx">without</span><span class="p">,</span>
                 <span class="nx">keys</span><span class="p">,</span>
                 <span class="nx">isEqual</span><span class="p">,</span>
-                <span class="nx">debounce</span>
+                <span class="nx">debounce</span><span class="p">,</span>
+                <span class="nx">reduce</span>
             <span class="p">));</span>
         <span class="p">});</span>
     <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
@@ -166,7 +169,8 @@ instance.
             <span class="nx">without</span>  <span class="o">=</span> <span class="nx">root</span><span class="p">.</span><span class="nx">_</span><span class="p">.</span><span class="nx">without</span><span class="p">,</span>
             <span class="nx">keys</span> <span class="o">=</span> <span class="nx">root</span><span class="p">.</span><span class="nx">_</span><span class="p">.</span><span class="nx">keys</span><span class="p">,</span>
             <span class="nx">isEqual</span> <span class="o">=</span> <span class="nx">root</span><span class="p">.</span><span class="nx">_</span><span class="p">.</span><span class="nx">isEqual</span><span class="p">,</span>
-            <span class="nx">debounce</span> <span class="o">=</span> <span class="nx">root</span><span class="p">.</span><span class="nx">_</span><span class="p">.</span><span class="nx">debounce</span><span class="p">;</span>
+            <span class="nx">debounce</span> <span class="o">=</span> <span class="nx">root</span><span class="p">.</span><span class="nx">_</span><span class="p">.</span><span class="nx">debounce</span><span class="p">,</span>
+            <span class="nx">reduce</span> <span class="o">=</span> <span class="nx">root</span><span class="p">.</span><span class="nx">_</span><span class="p">.</span><span class="nx">reduce</span><span class="p">;</span>
 
         <span class="nx">root</span><span class="p">.</span><span class="nx">WindowManager</span> <span class="o">=</span> <span class="nx">factory</span><span class="p">(</span>
             <span class="nx">$</span><span class="p">,</span>
@@ -183,10 +187,11 @@ instance.
             <span class="nx">without</span><span class="p">,</span>
             <span class="nx">keys</span><span class="p">,</span>
             <span class="nx">isEqual</span><span class="p">,</span>
-            <span class="nx">debounce</span>
+            <span class="nx">debounce</span><span class="p">,</span>
+            <span class="nx">reduce</span>
         <span class="p">);</span>
     <span class="p">}</span>
-<span class="p">}(</span><span class="k">this</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$</span><span class="p">,</span> <span class="nx">events</span><span class="p">,</span> <span class="nx">extend</span><span class="p">,</span> <span class="nx">delay</span><span class="p">,</span> <span class="nx">isObject</span><span class="p">,</span> <span class="nx">each</span><span class="p">,</span> <span class="nx">cloneDeep</span><span class="p">,</span> <span class="nx">bind</span><span class="p">,</span> <span class="nx">_min</span><span class="p">,</span> <span class="nx">_max</span><span class="p">,</span> <span class="nx">toArray</span><span class="p">,</span> <span class="nx">_without</span><span class="p">,</span> <span class="nx">_keys</span><span class="p">,</span> <span class="nx">_isEqual</span><span class="p">,</span> <span class="nx">_debounce</span><span class="p">)</span> <span class="p">{</span>
+<span class="p">}(</span><span class="k">this</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$</span><span class="p">,</span> <span class="nx">events</span><span class="p">,</span> <span class="nx">extend</span><span class="p">,</span> <span class="nx">delay</span><span class="p">,</span> <span class="nx">isObject</span><span class="p">,</span> <span class="nx">each</span><span class="p">,</span> <span class="nx">cloneDeep</span><span class="p">,</span> <span class="nx">bind</span><span class="p">,</span> <span class="nx">_min</span><span class="p">,</span> <span class="nx">_max</span><span class="p">,</span> <span class="nx">toArray</span><span class="p">,</span> <span class="nx">_without</span><span class="p">,</span> <span class="nx">_keys</span><span class="p">,</span> <span class="nx">_isEqual</span><span class="p">,</span> <span class="nx">_debounce</span><span class="p">,</span> <span class="nx">_reduce</span><span class="p">)</span> <span class="p">{</span>
 
 
 </pre></div>
@@ -712,7 +717,7 @@ Useful when window manager is instantiated before we want any of the attached ev
 
         </td>
         <td class="code highlight"><div class="highlight"><pre>
-        <span class="k">if</span><span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">config</span><span class="p">)</span> <span class="nx">_</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">Config</span><span class="p">,</span> <span class="nx">options</span><span class="p">.</span><span class="nx">config</span><span class="p">);</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">options</span><span class="p">.</span><span class="nx">config</span><span class="p">)</span> <span class="nx">extend</span><span class="p">(</span><span class="nx">Config</span><span class="p">,</span> <span class="nx">options</span><span class="p">.</span><span class="nx">config</span><span class="p">);</span>
 
 </pre></div>
         </td>
@@ -1380,7 +1385,7 @@ opened on a window that already exists.</p>
             <span class="nx">left</span><span class="o">:</span> <span class="nx">win</span><span class="p">.</span><span class="nx">left</span><span class="p">,</span>
             <span class="nx">top</span><span class="o">:</span> <span class="nx">win</span><span class="p">.</span><span class="nx">top</span>
         <span class="p">};</span>
-        <span class="kd">var</span> <span class="nx">windowAttrs</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">winAttrObj</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">val</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">windowAttrs</span> <span class="o">=</span> <span class="nx">_reduce</span><span class="p">(</span><span class="nx">winAttrObj</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="nx">val</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
             <span class="k">if</span><span class="p">(</span><span class="nx">val</span> <span class="o">==</span> <span class="kc">null</span><span class="p">)</span> <span class="k">return</span> <span class="nx">result</span><span class="p">;</span>
             <span class="k">if</span><span class="p">(</span><span class="nx">result</span> <span class="o">!==</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="nx">result</span> <span class="o">+=</span> <span class="s1">&#39;,&#39;</span><span class="p">;</span>
             <span class="nx">result</span> <span class="o">+=</span> <span class="nx">key</span> <span class="o">+</span> <span class="s1">&#39;=&#39;</span> <span class="o">+</span> <span class="nx">val</span><span class="p">;</span>
@@ -2828,6 +2833,10 @@ options.silent to close windows
             <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;windowRemoved&quot;</span><span class="p">,</span>
             <span class="nx">to</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">parent</span>
         <span class="p">},</span> <span class="nx">name</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">parent</span><span class="p">);</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">send</span><span class="p">({</span>
+            <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;windowRemoved:&quot;</span> <span class="o">+</span> <span class="nx">name</span><span class="p">,</span>
+            <span class="nx">to</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">parent</span>
+        <span class="p">},</span> <span class="k">this</span><span class="p">.</span><span class="nx">getWindow</span><span class="p">(</span><span class="nx">name</span><span class="p">));</span>
     <span class="p">};</span>
 
 </pre></div>

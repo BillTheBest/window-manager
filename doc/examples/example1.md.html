@@ -69,6 +69,24 @@ Create a WindowManager instance.
 
 
 <div class="clear"></div>
+
+<div class="left">
+    Setup events for when a window is added and removed to toggle close and focus buttons.
+</div>
+
+
+<div class="highlight"><pre><code>    <span class="nx">wm</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;windowAdded:subPage1&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.close-btn&#39;</span><span class="p">).</span><span class="nx">prop</span><span class="p">(</span><span class="s1">&#39;disabled&#39;</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+        <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.focus-btn&#39;</span><span class="p">).</span><span class="nx">prop</span><span class="p">(</span><span class="s1">&#39;disabled&#39;</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+    <span class="p">});</span>
+    <span class="nx">wm</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;windowRemoved:subPage1&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.close-btn&#39;</span><span class="p">).</span><span class="nx">prop</span><span class="p">(</span><span class="s1">&#39;disabled&#39;</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+        <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;.focus-btn&#39;</span><span class="p">).</span><span class="nx">prop</span><span class="p">(</span><span class="s1">&#39;disabled&#39;</span><span class="p">,</span> <span class="kc">true</span><span class="p">);</span>
+    <span class="p">});</span>
+</code></pre></div>
+
+
+<div class="clear"></div>
 <div class="left">
     Define our click event on the open button. Popup a window with a location. 
     The target page must also have a WindowManager instance with the name &#39;subPage1&#39;.

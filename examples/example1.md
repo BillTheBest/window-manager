@@ -42,6 +42,22 @@ Create a WindowManager instance.
     });
 ```
 <div class="clear"></div>
+
+<div class="left">
+	Setup events for when a window is added and removed to toggle close and focus buttons.
+</div>
+
+```javascript
+    wm.on('windowAdded:subPage1', function() {
+        $('.close-btn').prop('disabled', false);
+        $('.focus-btn').prop('disabled', false);
+    });
+    wm.on('windowRemoved:subPage1', function() {
+        $('.close-btn').prop('disabled', true);
+        $('.focus-btn').prop('disabled', true);
+    });
+```
+<div class="clear"></div>
 <div class="left">
 	Define our click event on the open button. Popup a window with a location. 
 	The target page must also have a WindowManager instance with the name 'subPage1'.
