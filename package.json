@@ -1,6 +1,6 @@
 {
   "author": "Dataminr, Inc",
-  "name": "windowmanager",
+  "name": "window-manager",
   "version": "0.0.3",
   "description": "Makes managing and communicating between multiple windows across the same application trivial",
   "main": "windowmanager.js",
