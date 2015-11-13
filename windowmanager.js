@@ -159,6 +159,22 @@
             );
         return v > 4 ? v : undef;
     };
+    // Check if the page visibility api exists and visibilityState is equal to
+    // passed in value
+    var isPageVisibility = function(stateValue) {
+        if(!stateValue) return false;
+        var hiddenProp;
+        if (typeof document.visibilityState !== "undefined") { // Opera 12.10 and Firefox 18 and later support
+            hiddenProp = "visibilityState";
+        } else if (typeof document.mozVisibilityState !== "undefined") {
+            hiddenProp = "mozVisibilityState";
+        } else if (typeof document.msVisibilityState !== "undefined") {
+            hiddenProp = "msVisibilityState";
+        } else if (typeof document.webkitVisibilityState !== "undefined") {
+            hiddenProp = "webkitVisibilityState";
+        }
+        return Boolean(document[hiddenProp] === stateValue);
+    };
     var isPageHidden = function() {
         // Set the name of the hidden property and the change event for visibility
         var hidden;
@@ -216,11 +232,13 @@
         isValidWindow: function(win) {
             var valid = false;
             try {
-                valid = win != null && win.outerHeight && win.innerHeight && !isPageHidden();
+                valid = win != null && win.outerHeight && win.innerHeight && !isPageVisibility("prerender");
             } catch(e) {
             }
             return valid;
         },
+        isPageVisibility: isPageVisibility,
+        isHiddenWindow: isPageHidden,
         getUniqueWindowName: function(name, parent) {
             return name + ':' + parent;
         },
