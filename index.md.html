@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>index.md</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="doc-style.css" />
+  <script src="doc-filelist.js"></script>
+  <script>
+    var relativeDir = "", thisFile = "index.md", defaultSidebar = true;
+  </script>
+  <script src="doc-script.js"></script>
+  <link rel="stylesheet" href="docs-style.css" />
+</head>
+<body>
+  <div id="sidebar_wrapper">
+    <div id="sidebar_switch">
+      <span class="tree">Files</span>
+      <span class="headings">Headings</span>
+    </div>
+    <div id="tree"></div>
+    <div id="headings">
+    </div>
+  </div>
+  <div id="sidebar-toggle"></div>
+  <div id="container"><div class="docs markdown">
+<div class="pilwrap">
+  <a class="pilcrow" href="#section-1" id="section-1">&#182;</a>
+</div>
+<div class="project-header">
+    <div class="project-name">WindowManager</div>
+    <div class="intro">
+        WindowManager makes managing managing and communication between browser windows easier.
+     </div>
+</div>
+
+<h2 id="source">Source</h2>
+<p>Read the annotated source <a href="windowmanager.js.html" target="_blank">here</a></p>
+<div class="clear"></div>
+<div class="spacer"></div>
+
+<h2 id="overview">Overview</h2>
+<p>The following are the core features of a WindowManager instance.</p>
+<ul>
+<li>Communicating between windows</li>
+<li>Opening, closing and focusing windows as well as remembering window properties</li>
+<li>Storing properties associated with windows</li>
+<li>Animating windows</li>
+<li>Lets you specify a &quot;master&quot; window that can control &quot;sub&quot; windows. A master window may contain other popup windows under it. These are automatically opened when the master windowManager is instantiated and their properties like width, height etc are retained from the last time the master window was closed.</li>
+<li>Can ensure window uniqueness by referencing a &#39;name&#39; property of each WindowManager instance.    </li>
+</ul>
+<div class="clear"></div>
+
+<h2 id="examples">Examples</h2>
+<p><a href="examples/example1.md.html">Basic example</a><br>
+<a href="examples/example2.md.html">Inter window messaging</a><br>
+<a href="examples/example3.md.html">Animated Windows</a></p>
+<h2 id="api">API</h2>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#send">send</a></td>
+<td>sends a message by name to a given window</td>
+</tr>
+<tr>
+<td><a href="#on">on</a></td>
+<td>subscribe to a message sent to the current window</td>
+</tr>
+<tr>
+<td><a href="#popupWindow">popupWindow</a></td>
+<td>Opens a window with the given name and parameters like width, height, location etc</td>
+</tr>
+<tr>
+<td><a href="#closeWindow">closeWindow</a></td>
+<td>Closes a window by name</td>
+</tr>
+<tr>
+<td><a href="#focusWindow">focusWindow</a></td>
+<td>Focuses a window by name</td>
+</tr>
+<tr>
+<td><a href="#setProperty">setProperty</a></td>
+<td>sets a property of a window</td>
+</tr>
+<tr>
+<td><a href="#getProperty">getProperty</a></td>
+<td>gets a property of a window</td>
+</tr>
+<tr>
+<td><a href="#deleteProperty">deleteProperty</a></td>
+<td>deletes a property of a window</td>
+</tr>
+<tr>
+<td><a href="#setProperties">setProperties</a></td>
+<td>sets all properties on a window</td>
+</tr>
+<tr>
+<td><a href="#getProperties">getProperties</a></td>
+<td>gets all properties on a window</td>
+</tr>
+<tr>
+<td><a href="#getWindow">getWindow</a></td>
+<td>get a window object by name</td>
+</tr>
+<tr>
+<td><a href="#getAllWindows">getAllWindows</a></td>
+<td>gets an object containing all windows of a given parent</td>
+</tr>
+<tr>
+<td><a href="#getCurrentWindow">getCurrentWindow</a></td>
+<td>gets an object containing all windows of a given parent</td>
+</tr>
+<tr>
+<td><a href="#setCurrentWindow">setCurrentWindow</a></td>
+<td>set the current windows attributes like width, height, location etc of the current window in memory</td>
+</tr>
+<tr>
+<td><a href="#clearMemory">clearMemory</a></td>
+<td>wipes the memory for the current namespace clean</td>
+</tr>
+</tbody>
+</table>
+<p><a id="send"></a></p>
+<h3 id="send">send</h3>
+<p>Sends a message to a window. </p>
+<p>Takes a &#39;name&#39; parameter of the message that is the then triggered on the receiving window.</p>
+
+<div class="highlight"><pre><code>    <span class="c1">// Can provide a &#39;name&#39; parameter which is the name of the message to send</span>
+    <span class="c1">// the &#39;to&#39; parameter specifies who to send the message to</span>
+    <span class="nx">windowManager</span><span class="p">.</span><span class="nx">send</span><span class="p">({</span>
+        <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;logout&#39;</span><span class="p">,</span>
+        <span class="nx">to</span><span class="o">:</span> <span class="s1">&#39;dashboard&#39;</span>
+    <span class="p">});</span>
+    <span class="c1">// &#39;to&#39; can also be an array of windowManager instance names</span>
+    <span class="nx">windowManager</span><span class="p">.</span><span class="nx">send</span><span class="p">({</span>
+        <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;logout&#39;</span><span class="p">,</span>
+        <span class="nx">to</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;dashboard&#39;</span><span class="p">,</span> <span class="s1">&#39;search&#39;</span><span class="p">]</span>
+    <span class="p">});</span>
+    <span class="c1">// If the &#39;to&#39; parameter is left out, the message is sent to all children </span>
+    <span class="c1">// within the current parent</span>
+    <span class="nx">windowManager</span><span class="p">.</span><span class="nx">send</span><span class="p">({</span>
+        <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;logout&#39;</span>
+    <span class="p">});</span>
+    <span class="c1">// Can specify a different parent to target as well</span>
+    <span class="nx">windowManager</span><span class="p">.</span><span class="nx">send</span><span class="p">({</span>
+        <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;logout&#39;</span>
+        <span class="nx">parent</span><span class="o">:</span> <span class="s1">&#39;myOtherApp&#39;</span>
+    <span class="p">});</span>
+    <span class="c1">// In order to send a message to an &#39;external&#39; type window the &#39;parent&#39; parameter must be &#39;external&#39;</span>
+    <span class="nx">windowManager</span><span class="p">.</span><span class="nx">send</span><span class="p">({</span>
+        <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;externalWindow&#39;</span>
+        <span class="nx">parent</span><span class="o">:</span> <span class="s1">&#39;external&#39;</span>
+    <span class="p">});</span>
+</code></pre></div>
+
+
+<div class="clear"></div>
+
+<p><a id="on"></a></p>
+<h3 id="on">on</h3>
+<p>Subscribe to a message sent to the current window. Takes a callback function that is passed an &#39;event object&#39; along with additional arguments
+passed to the &#39;send&#39;</p>
+
+<div class="highlight"><pre><code>    <span class="c1">// Takes an event name and a callback function</span>
+   <span class="nx">windowManager</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;logout&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">evt</span><span class="p">,</span> <span class="nx">additionalArg1</span><span class="p">,</span> <span class="nx">additionalArg2</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">evt</span><span class="p">.</span><span class="nx">from</span><span class="p">);</span> <span class="c1">// Name of the sender</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">evt</span><span class="p">.</span><span class="nx">to</span><span class="p">);</span> <span class="c1">// Name of the recipient</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">evt</span><span class="p">.</span><span class="nx">parent</span><span class="p">);</span> <span class="c1">// Name of the recipient parent</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">evt</span><span class="p">.</span><span class="nx">fromParent</span><span class="p">);</span> <span class="c1">// Name of the sender parent</span>
+    <span class="p">});</span>
+</code></pre></div>
+
+
+<p><a id="popupWindow"></a></p>
+<h3 id="popupwindow">popupWindow</h3>
+<p>Subscribe to a message sent to the current window. Takes a callback function that is passed an &#39;event object&#39; along with additional arguments
+passed to the &#39;send&#39;</p>
+
+<div class="highlight"><pre><code>    <span class="c1">// Takes an window name and location</span>
+    <span class="nx">windowManager</span><span class="p">.</span><span class="nx">popupWindow</span><span class="p">({</span>
+        <span class="nx">location</span><span class="o">:</span> <span class="s1">&#39;http://www.mydomain.com/myPage1&#39;</span><span class="p">,</span>
+        <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;myPage1&#39;</span>
+    <span class="p">});</span>
+
+    <span class="c1">// Also takes additional window property parameters</span>
+    <span class="nx">windowManager</span><span class="p">.</span><span class="nx">popupWindow</span><span class="p">({</span>
+        <span class="nx">location</span><span class="o">:</span> <span class="s1">&#39;http://www.mydomain.com/myPage1&#39;</span><span class="p">,</span>
+        <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;myPage1&#39;</span><span class="p">,</span>
+        <span class="nx">width</span><span class="o">:</span> <span class="mi">300</span><span class="p">,</span>
+        <span class="nx">height</span><span class="o">:</span> <span class="mi">500</span><span class="p">,</span>
+        <span class="nx">resizeable</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="nx">left</span><span class="o">:</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="nx">top</span><span class="o">:</span> <span class="mi">200</span>
+    <span class="p">});</span>
+
+    <span class="c1">// setting focus to true will focus the window to the foreground if that window is already open</span>
+    <span class="nx">windowManager</span><span class="p">.</span><span class="nx">popupWindow</span><span class="p">({</span>
+        <span class="nx">location</span><span class="o">:</span> <span class="s1">&#39;http://www.mydomain.com/myPage1&#39;</span><span class="p">,</span>
+        <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;myPage1&#39;</span><span class="p">,</span>
+        <span class="nx">focus</span><span class="o">:</span> <span class="kc">true</span>
+    <span class="p">});</span>
+</code></pre></div>
+
+
+<div class="clear"></div>
+
+<p><a id="closeWindow"></a></p>
+<h3 id="closewindow">closeWindow</h3>
+<p>Closes a currently open window by name.</p>
+<p><strong>Note:</strong> This method will only work for pages that are popups. This will not work on browser tabs.</p>
+
+<div class="highlight"><pre><code>    <span class="c1">// Closes a window by name</span>
+    <span class="nx">windowManager</span><span class="p">.</span><span class="nx">closeWindow</span><span class="p">(</span><span class="s1">&#39;myPage1&#39;</span><span class="p">);</span>
+
+    <span class="c1">// Can optionally specify a parent if not the current parent</span>
+    <span class="nx">windowManager</span><span class="p">.</span><span class="nx">closeWindow</span><span class="p">(</span><span class="s1">&#39;myPage1&#39;</span><span class="p">,</span> <span class="s1">&#39;myOtherApp&#39;</span><span class="p">);</span>
+</code></pre></div>
+
+
+<div class="clear"></div>
+
+<p><a id="focusWindow"></a></p>
+<h3 id="focuswindow">focusWindow</h3>
+<p>Brings a window that is already open to the foreground. 
+Does this by either using a windows focus method if a reference to the window is available or reopening it if not.</p>
+<p>Fires a focusedWindow event when done. Takes an options object with the following options.</p>
+<ul>
+<li><strong>name</strong> {string} Name of the window to focus</li>
+<li><strong>parent</strong> {string} (Optional) Parent of the window to focus.</li>
+<li><strong>windowName</strong> {string} (Optional) Name of &#39;window&#39; to restrict focus to</li>
+<li><strong>redirectUrl</strong> {boolean} (Optional) Whether to redirect url if window is already open. Defaults to false.</li>
+<li><strong>reopenAllChildren</strong> {boolean} (Optional) Whether to open all children of the window. Defaults to true.</li>
+<li><strong>noUserAction</strong> {boolean} (Optional) If this is set to true, the window will always be opened using a new window. 
+This is due to a browser limitation that prevents focusing an already opened window if there is no user action in the call stack.
+Only needs to be specified if different from current instances parent.</li>
+</ul>
+<p><strong>Note:</strong> This method will only work for pages that are popups. This will not work on browser tabs.</p>
+
+<div class="highlight"><pre><code>    <span class="c1">// Focus a window by name</span>
+    <span class="nx">windowManager</span><span class="p">.</span><span class="nx">focusWindow</span><span class="p">({</span>
+        <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;myPage1&#39;</span>
+    <span class="p">});</span>
+</code></pre></div>
+
+
+<div class="clear"></div>
+
+<p><a id="setProperty"></a></p>
+<h3 id="setproperty">setProperty</h3>
+<p>Set a property of a window. These are persisted in memory</p>
+<p>Defaults to the current window&#39;s properties unless otherwise specifying a name and/or a parent</p>
+
+<div class="highlight"><pre><code>    <span class="c1">// Set a windows property by key</span>
+    <span class="nx">windowManager</span><span class="p">.</span><span class="nx">setProperty</span><span class="p">(</span><span class="s1">&#39;color&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">);</span>
+
+    <span class="c1">// Set another windows properties on another parent</span>
+    <span class="nx">windowManager</span><span class="p">.</span><span class="nx">getProperty</span><span class="p">(</span><span class="s1">&#39;color&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="s1">&#39;myOtherWindow&#39;</span><span class="p">,</span> <span class="s1">&#39;myOtherParent&#39;</span><span class="p">);</span>
+</code></pre></div>
+
+
+<div class="clear"></div>
+
+<p><a id="getProperty"></a></p>
+<h3 id="getproperty">getProperty</h3>
+<p>Get a persisted property of a window.</p>
+<p>Defaults to the current window&#39;s properties unless otherwise specifying a name and/or a parent</p>
+
+<div class="highlight"><pre><code>    <span class="c1">// Get a windows property by key</span>
+    <span class="nx">windowManager</span><span class="p">.</span><span class="nx">getProperty</span><span class="p">(</span><span class="s1">&#39;color&#39;</span><span class="p">);</span>
+
+    <span class="c1">// Get another windows properties on another parent</span>
+    <span class="nx">windowManager</span><span class="p">.</span><span class="nx">getProperty</span><span class="p">(</span><span class="s1">&#39;color&#39;</span><span class="p">,</span> <span class="s1">&#39;myOtherWindow&#39;</span><span class="p">,</span> <span class="s1">&#39;myOtherParent&#39;</span><span class="p">);</span>
+</code></pre></div>
+
+
+<div class="clear"></div>
+
+<p><a id="deleteProperty"></a></p>
+<h3 id="deleteproperty">deleteProperty</h3>
+<p>Delete a persisted property of a window.</p>
+<p>Defaults to the current window&#39;s properties unless otherwise specifying a name and/or a parent</p>
+
+<div class="highlight"><pre><code>    <span class="c1">// Get a windows property by key</span>
+    <span class="nx">windowManager</span><span class="p">.</span><span class="nx">deleteProperty</span><span class="p">(</span><span class="s1">&#39;color&#39;</span><span class="p">);</span>
+
+    <span class="c1">// Get another windows properties on another parent</span>
+    <span class="nx">windowManager</span><span class="p">.</span><span class="nx">deleteProperty</span><span class="p">(</span><span class="s1">&#39;color&#39;</span><span class="p">,</span> <span class="s1">&#39;myOtherWindow&#39;</span><span class="p">,</span> <span class="s1">&#39;myOtherParent&#39;</span><span class="p">);</span>
+</code></pre></div>
+
+
+<div class="clear"></div>
+
+<p><a id="setProperties"></a></p>
+<h3 id="setproperties">setProperties</h3>
+<p>Set all properties of a window. These are persisted in memory.</p>
+
+<div class="highlight"><pre><code>    <span class="c1">// Set a windows properties as an object</span>
+    <span class="nx">windowManager</span><span class="p">.</span><span class="nx">setProperties</span><span class="p">({</span>
+        <span class="nx">color</span><span class="o">:</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span>
+        <span class="nx">count</span><span class="o">:</span> <span class="mi">1</span>
+    <span class="p">});</span>
+
+    <span class="c1">// Set another windows properties as an object</span>
+    <span class="nx">windowManager</span><span class="p">.</span><span class="nx">setProperties</span><span class="p">({</span>
+        <span class="nx">color</span><span class="o">:</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span>
+        <span class="nx">count</span><span class="o">:</span> <span class="mi">1</span>
+    <span class="p">},</span> <span class="s1">&#39;myOtherWindow&#39;</span><span class="p">,</span> <span class="s1">&#39;myOtherParent&#39;</span><span class="p">);</span>
+</code></pre></div>
+
+
+<div class="clear"></div>
+
+<p><a id="getProperties"></a></p>
+<h3 id="getproperties">getProperties</h3>
+<p>Get all properties of a window.</p>
+
+<div class="highlight"><pre><code>    <span class="c1">// Get a windows properties as an object</span>
+    <span class="nx">windowManager</span><span class="p">.</span><span class="nx">getProperties</span><span class="p">();</span>
+
+    <span class="c1">// Set another windows properties as an object</span>
+    <span class="nx">windowManager</span><span class="p">.</span><span class="nx">getProperties</span><span class="p">(</span><span class="s1">&#39;myOtherWindow&#39;</span><span class="p">,</span> <span class="s1">&#39;myOtherParent&#39;</span><span class="p">);</span>
+</code></pre></div>
+
+
+<div class="clear"></div>
+
+<p><a id="getWindow"></a></p>
+<h3 id="getwindow">getWindow</h3>
+<p>Get the object representation of a window.</p>
+
+<div class="highlight"><pre><code>    <span class="c1">// Get a window as an object</span>
+    <span class="nx">windowManager</span><span class="p">.</span><span class="nx">getWindow</span><span class="p">(</span><span class="s1">&#39;myOtherWindow&#39;</span><span class="p">);</span>
+
+    <span class="c1">// Get a window on another parent as an object</span>
+    <span class="nx">windowManager</span><span class="p">.</span><span class="nx">getWindow</span><span class="p">(</span><span class="s1">&#39;myOtherWindow&#39;</span><span class="p">,</span> <span class="s1">&#39;myOtherParent&#39;</span><span class="p">);</span>
+</code></pre></div>
+
+
+<div class="clear"></div>
+
+<p><a id="getAllWindows"></a></p>
+<h3 id="getallwindows">getAllWindows</h3>
+<p>Get an object representation for all windows in a given parent</p>
+
+<div class="highlight"><pre><code>    <span class="c1">// Get all windows in current parent</span>
+    <span class="nx">windowManager</span><span class="p">.</span><span class="nx">getAllWindows</span><span class="p">();</span>
+
+    <span class="c1">// Get all windows in another parent</span>
+    <span class="nx">windowManager</span><span class="p">.</span><span class="nx">getAllWindows</span><span class="p">(</span><span class="s1">&#39;myOtherParent&#39;</span><span class="p">);</span>
+</code></pre></div>
+
+
+<div class="clear"></div>
+
+<p><a id="getCurrentWindow"></a></p>
+<h3 id="getcurrentwindow">getCurrentWindow</h3>
+<p>Get the object representation of the current window</p>
+
+<div class="highlight"><pre><code>    <span class="c1">// Get the current window</span>
+    <span class="nx">windowManager</span><span class="p">.</span><span class="nx">getCurrentWindow</span><span class="p">();</span>
+</code></pre></div>
+
+
+<div class="clear"></div>
+
+<p><a id="setCurrentWindow"></a></p>
+<h3 id="setcurrentwindow">setCurrentWindow</h3>
+<p>Set the windows attributes like width, height, location etc of the current window in memory</p>
+
+<div class="highlight"><pre><code>    <span class="c1">// Set the current Window</span>
+    <span class="nx">windowManager</span><span class="p">.</span><span class="nx">setCurrentWindow</span><span class="p">();</span>
+</code></pre></div>
+
+
+<div class="clear"></div>
+
+<p><a id="clearMemory"></a></p>
+<h3 id="clearmemory">clearMemory</h3>
+<p>Clears the memory for a given &#39;namespace&#39;</p>
+
+<div class="highlight"><pre><code>    <span class="c1">// Set the current Window</span>
+    <span class="nx">windowManager</span><span class="p">.</span><span class="nx">clearMemory</span><span class="p">();</span>
+</code></pre></div>
+
+
+<div class="clear"></div>
+
+
+<h2 id="usage">Usage</h2>
+<p>There are 3 different types of WindowManager instances</p>
+<p><strong>Note:</strong> Only windows in the same localStorage &#39;namespace&#39; are capable of interacting with each other</p>
+<h4 id="master">master</h4>
+<div class="left">
+The main window associated with a set of windows.
+<ul>
+<li>When it opens, all &quot;sub&quot; windows associated with it are opened automatically.</li>
+<li>A given &#39;namespace&#39; in localStorage can have multiple &quot;master&quot; windows.</li>
+<li>A master window can have multiple &quot;sub&quot; windows.</li>
+</ul>
+</div>
+
+
+<div class="highlight"><pre><code> <span class="c1">// Example of initializing a &#39;master&#39; WindowManager instance</span>
+ <span class="k">new</span> <span class="nx">WindowManager</span><span class="p">({</span>
+     <span class="c1">// The name of the window used as its id</span>
+     <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;parentPage&#39;</span><span class="p">,</span>
+     <span class="c1">// The type of the window</span>
+     <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;master&#39;</span>
+      <span class="c1">// The key used in localStorage</span>
+     <span class="nx">namespace</span><span class="o">:</span> <span class="s1">&#39;windowManager01&#39;</span><span class="p">,</span>
+ <span class="p">});</span>
+</code></pre></div>
+
+
+<div class="clear"></div>
+
+<h4 id="sub">sub</h4>
+<div class="left">
+These are windows associated with a &quot;master&quot; window as their parent.
+<ul>
+<li>They are opened automatically when their parent is opened.</li>
+<li>Their properties like width and height are persisted in memory and are reused when their are opened.</li>
+</ul>
+</div>
+
+
+<div class="highlight"><pre><code> <span class="c1">// Example of initializing a &#39;sub&#39; WindowManager instance</span>
+ <span class="k">new</span> <span class="nx">WindowManager</span><span class="p">({</span>
+     <span class="c1">// The name of the window used as its id</span>
+     <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;subPage1&#39;</span><span class="p">,</span>
+    <span class="c1">// The name of its parent master window</span>
+     <span class="nx">parent</span><span class="o">:</span> <span class="s1">&#39;parentPage&#39;</span><span class="p">,</span>
+     <span class="c1">// The namespace key used in localStorage</span>
+     <span class="c1">// Should match its parents key</span>
+     <span class="nx">namespace</span><span class="o">:</span> <span class="s1">&#39;windowManager01&#39;</span><span class="p">,</span>
+ <span class="p">});</span>
+</code></pre></div>
+
+
+<div class="clear"></div>
+
+<h4 id="external">external</h4>
+<div class="left">
+These are windows that are external to any &quot;master&quot; window.
+<ul>
+<li>Not associated with a parent &quot;master&quot; window</li>
+<li>Not persisted in memory</li>
+<li>Capable of communicating with all other windows in the same namespace</li>
+</ul>
+</div>
+
+
+<div class="highlight"><pre><code> <span class="c1">// Example of initializing an &#39;external&#39; WindowManager instance</span>
+ <span class="k">new</span> <span class="nx">WindowManager</span><span class="p">({</span>
+     <span class="c1">// The name of the window used as its id</span>
+     <span class="nx">name</span><span class="o">:</span> <span class="s1">&#39;externalPopup&#39;</span><span class="p">,</span>
+     <span class="c1">// The type of the window &#39;external&#39;</span>
+     <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;external&#39;</span><span class="p">,</span>
+     <span class="c1">// The namespace key used in localStorage</span>
+     <span class="nx">namespace</span><span class="o">:</span> <span class="s1">&#39;windowManager01&#39;</span>
+ <span class="p">});</span>
+</code></pre></div>
+
+
+<div class="clear"></div>
+</div>
+  </div>
+</body>
+</html>
